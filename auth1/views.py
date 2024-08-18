@@ -30,6 +30,8 @@ print(conn)
 print(db)
 
 # Create your views here.
+
+
 @csrf_exempt
 @api_view(['POST'])
 def login(request):
@@ -51,21 +53,34 @@ def login(request):
 @csrf_exempt
 @api_view(['POST'])
 def signup(request):
-    email=request.data['email']
-    password=request.data['password']
-    name=request.data['name']
+    email = request.data['email']
+    password = request.data['password']
+    name = request.data['name']
+    username = request.data['username'] 
+    phone=request.data['phone']
 
     try:
-        islogin=conn.create_user_with_email_and_password(email,password)
+        # Check if the username already exists
 
-        data={'name':name,'email':email}
+        
+        user = db.child("users").child(username).get()
+        
+        if user.val() is not None:
+            return JsonResponse({'message': 'username_exists'})
 
-        db.child('users').push(data)
+        
+        islogin = conn.create_user_with_email_and_password(email, password)
 
-        return JsonResponse({'message':'created'})
+        paylaod = {'name': name, 'email': email, 'username': username, 'phone':phone}
+
+        data = {'name': name, 'email': email, 'username': username}
+        db.child('users').child(username).set(paylaod)
+
+        return JsonResponse({'message': 'created'})
+    
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'exists'})
+        return JsonResponse({'message': 'exists'})
     
 @csrf_exempt
 @api_view(['POST'])
