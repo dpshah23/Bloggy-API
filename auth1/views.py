@@ -43,9 +43,16 @@ def login(request):
 
         data={'email':email}
 
+        username=db.child.get('users').get()
+
+        for user in username.each():
+            if user.val()['email']==email:
+                username=data['username']
+                break
+
         db.child('activelogin').push(data)
 
-        return JsonResponse({'message':'Login successful'})
+        return JsonResponse({'message':'Login successful','username':username})
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Login failed'})
