@@ -42,7 +42,7 @@ def login(request):
         data={'email':email}
 
         db.child('activelogin').push(data)
-        
+
         return JsonResponse({'message':'Login successful'})
     except Exception as e:
         print(e)
@@ -66,3 +66,17 @@ def signup(request):
     except Exception as e:
         print(e)
         return JsonResponse({'message':'exists'})
+    
+@csrf_exempt
+@api_view(['POST'])
+def logout(request):
+    email=request.data['email']
+
+    try:
+        db.child('activelogin').remove()
+
+        return JsonResponse({'message':'Logout successful'})
+    
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Logout failed'})
