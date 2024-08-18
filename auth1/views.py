@@ -7,6 +7,7 @@ import pyrebase
 from pyrebase import pyrebase
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -43,11 +44,15 @@ def login(request):
 
         data={'email':email}
 
-        username=db.child.get('users').get()
+        users = db.child('users').get()
 
-        for user in username.each():
-            if user.val()['email']==email:
-                username=data['username']
+        username = None
+
+       
+        for user in users.each():
+            if user.val()['email'] == email:
+                username = user.val().get('username')
+                data['username'] = username
                 break
 
         db.child('activelogin').push(data)
