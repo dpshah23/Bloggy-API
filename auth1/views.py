@@ -38,8 +38,31 @@ def login(request):
 
     try:
         islogin=conn.sign_in_with_email_and_password(email,password)
+
+        data={'email':email}
+
+        db.child('activelogin').push(data)
+        
         return JsonResponse({'message':'Login successful'})
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Login failed'})
     
+@csrf_exempt
+@api_view(['POST'])
+def signup(request):
+    email=request.data['email']
+    password=request.data['password']
+    name=request.data['name']
+
+    try:
+        islogin=conn.create_user_with_email_and_password(email,password)
+
+        data={'name':name,'email':email}
+
+        db.child('users').push(data)
+
+        return JsonResponse({'message':'created'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'exists'})
