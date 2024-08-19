@@ -19,6 +19,9 @@ import firebase_admin
 
 from firebase_admin import credentials, storage, db
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 load_dotenv()
 
 
@@ -104,7 +107,7 @@ def createblog(request):
             "timestamp": timestamp,
             "id": id1
         }
-        path = f"blogs by {username}"
+        path = f"blogs by {username} "+id1
         ref.child("blogs").child(path).set(data)
         return JsonResponse({'message':'Blog created successfully'})
     
@@ -112,3 +115,35 @@ def createblog(request):
         print(e)
         return JsonResponse({'message':'Blog creation failed'})
     
+
+@csrf_exempt
+@api_view(['GET'])
+def getblogs(request):
+    try:
+        data=ref.child("blogs").get()
+        print(data)
+
+        if data is not None:
+            blog_list=list(data.values())
+        
+        else:
+            blog_list=[]
+
+        page_number=request.GET.get('page',1)
+
+        paginator=Paginator(blog_list,10)
+
+        page_obj=paginator.get_page(page_number)
+
+        blogs_json=json.loads(json.dumps(page_obj.object_list))
+
+        response_data={
+            "data":blogs_json,
+            "page_number":page_obj.number,
+            "total_pages":paginator.num_pages
+        }
+
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Failed to fetch blogs'})
