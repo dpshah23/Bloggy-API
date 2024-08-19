@@ -11,6 +11,8 @@ from datetime import datetime
 
 import string
 import random
+from django.shortcuts import render
+
 
 import json
 import re
@@ -200,3 +202,34 @@ def getuserblogs(request,username):
     
         print(e)
         return JsonResponse({'message':'Failed to fetch user blogs'})
+    
+def iframeblogs(request, username):
+    
+    if request.headers.get('Accept') == 'application/json':
+        try:
+           
+            data = ref.child('blogs').get()
+
+            # Check if data is not None and is a dictionary
+            if data is not None and isinstance(data, dict):
+                
+                blog_list = list(data.values())
+                
+               
+                user_blogs = [blog for blog in blog_list if blog.get('username') == username]
+
+                top_3_blogs = sorted(user_blogs, key=lambda x: x.get('timestamp'), reverse=True)
+
+                final = top_3_blogs[:3]
+                
+                return JsonResponse(final, safe=False)
+            
+            else:
+                return JsonResponse({'message': 'No data found'}, status=404)
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message': 'Failed to fetch user blogs'}, status=500)
+    
+    # Otherwise, render the HTML page
+    return render(request, 'blogs.html')

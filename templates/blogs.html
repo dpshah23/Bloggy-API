@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Blogs</title>
+    <style>
+        .blog-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .blog-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 30%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .blog-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .blog-item h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .blog-item p {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .blog-item small {
+            display: block;
+            margin-top: 10px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div id="blog-container" class="blog-container"></div>
+
+    <script>
+        // Function to create blog item elements
+        function createBlogItem(blog) {
+            let blogItem = document.createElement('div');
+            blogItem.className = 'blog-item';
+
+            let title = document.createElement('h3');
+            title.textContent = blog.title;
+
+            let image = document.createElement('img');
+            image.src = blog.image;
+            image.alt = blog.title;
+
+            let content = document.createElement('p');
+            content.textContent = blog.content;
+
+            let timestamp = document.createElement('small');
+            timestamp.textContent = `Posted on: ${blog.timestamp}`;
+
+            blogItem.appendChild(title);
+            blogItem.appendChild(image);
+            blogItem.appendChild(content);
+            blogItem.appendChild(timestamp);
+
+            blogItem.onclick = function () {
+                window.open(`myapp://blog/${blog.id}`, '_self');
+            };
+
+            return blogItem;
+        }
+
+        // Extract username from the URL
+        const url = new URL(window.location.href);
+        const pathname = url.pathname;
+        const segments = pathname.split('/');
+        const username = segments[segments.length - 2];
+
+        // Log the username to check if it's correctly extracted
+        console.log('Username:', username);
+
+        // Fetch the blog data from the API
+        fetch(`/api/get_top_3_blogs/${username}/`)
+            .then(response => response.json())
+            .then(data => {
+                let blogContainer = document.getElementById('blog-container');
+                data.forEach(blog => {
+                    let blogItem = createBlogItem(blog);
+                    blogContainer.appendChild(blogItem);
+                });
+            })
+            .catch(error => console.error('Error fetching blogs:', error));
+    </script>
+</body>
+</html>
