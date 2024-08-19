@@ -107,7 +107,7 @@ def createblog(request):
             "timestamp": timestamp,
             "id": id1
         }
-        path = f"blogs by {username} "+id1
+        path =id1
         ref.child("blogs").child(path).set(data)
         return JsonResponse({'message':'Blog created successfully'})
     
@@ -164,3 +164,22 @@ def profile(request,username):
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Failed to fetch user data'})
+    
+
+@csrf_exempt
+@api_view(['POST'])
+def getblog(request,id):
+    try:
+        data=ref.child('blogs').child(id).get()
+        
+
+        if data is not None:
+           
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'message':'Blog not found'},status=404)
+        
+    except Exception as e:
+
+        print(e)
+        return JsonResponse({'message':'Failed to fetch blog data'})
