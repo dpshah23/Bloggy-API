@@ -147,3 +147,20 @@ def getblogs(request):
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Failed to fetch blogs'})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def profile(request,username):
+    try:
+        data=ref.child('users').child(username).get()
+        
+
+        if data is not None:
+           
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'message':'User not found'},status=404)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Failed to fetch user data'})
