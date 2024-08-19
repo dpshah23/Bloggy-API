@@ -15,8 +15,12 @@ import random
 import json
 import re
 import base64
+import firebase_admin
+
+from firebase_admin import credentials, storage, db
 
 load_dotenv()
+
 
 config = {
     "apiKey": os.getenv('apikey'),
@@ -28,6 +32,14 @@ config = {
     "measurementId": os.getenv('measurementId'),
     "databaseURL": os.getenv('databaseURL')
 }
+cred=credentials.Certificate("serviceAccountKey.json")
+
+firebase_admin.initialize_app(cred, {
+    'storageBucket': config['storageBucket'],
+    'databaseURL': config['databaseURL']
+})
+
+ref=db.reference()
 
 print(config)
 
@@ -61,10 +73,6 @@ def createblog(request):
         email = data.get('email')
         image = data.get('image')
 
-        sanitized_title = re.sub(r'[^\w\s-]', '', title).strip().replace(' ', '_')
-
-        sanitized_content = re.sub(r'[^\w\s-]', '', content).strip().replace(' ', '_')
-
 
         id1=''.join(random.choices(string.ascii_uppercase + string.digits, k=15))
         data={'id':id1,'title':title,'content':content,'username':username,'timestamp':timestamp,'email':email,'image':image}
@@ -88,15 +96,16 @@ def createblog(request):
             return JsonResponse({'message': 'Invalid image data'}, status=400)
         
         data={
-            "title": sanitized_title, 
-            "content": sanitized_content,
+            "title": title, 
+            "content": content,
             "username": username,
             "email": email,
             "image": image_url,
             "timestamp": timestamp,
             "id": id1
         }
-        db.child('blogs').child(f"{title} by {username}").set(data)
+        path = f"blogs by {username}"
+        ref.child("blogs").child(path).set(data)
         return JsonResponse({'message':'Blog created successfully'})
     
     except Exception as e:
