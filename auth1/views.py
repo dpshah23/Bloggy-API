@@ -8,6 +8,7 @@ from pyrebase import pyrebase
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from pyrebase.pyrebase import storage
 
 load_dotenv()
 
@@ -24,8 +25,11 @@ config = {
 
 print(config)
 
+
+
 firebase = pyrebase.initialize_app(config)
 conn = firebase.auth()
+
 db=firebase.database()
 print(conn) 
 print(db)
@@ -56,6 +60,8 @@ def login(request):
                 break
 
         db.child('activelogin').push(data)
+
+        print(username)
 
         return JsonResponse({'message':'Login successful','username':username})
     except Exception as e:
