@@ -113,3 +113,39 @@ def logout(request):
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Logout failed'})
+    
+
+@csrf_exempt
+@api_view(['POST'])
+def forgetpass(request):
+    
+    email=request.data['email']
+
+    try:
+        try:
+            email_exists=db.child('users').get()
+            for emails in email_exists.each():
+                if emails.val()['email'] == email:
+                    email_exists=True
+                    break
+                else:
+                    email_exists=False
+
+            if email_exists:
+                print(email_exists)
+                print(email)
+                print("email sent")
+
+                return JsonResponse({'message':'Mail sent'})
+            
+            else:
+                print("doesn't exist")
+                return JsonResponse({'message':'Email not found'})
+            
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Email not found'})
+    
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Password reset failed'})
