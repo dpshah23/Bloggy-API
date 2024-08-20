@@ -3,102 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Blogs</title>
+    <title>Blogs</title>
     <style>
-        .blog-container {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    {% if background == "dark" %}
 
-        .blog-item {
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: 30%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-        }
+    body{
+        margin:0;
+        padding:0;
+    }
+    .blog-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        background-color: #1c1c1c; /* Dark background */
+        max-width: {{ max_width }}px;
+        max-height: {{ min_height }}px;
+        overflow-y: auto; /* Enables vertical scrolling if content exceeds max-height */
+        margin: 0;
+    }
 
-        .blog-item img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
+    .blog-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+        background-color: #2c2c2c; /* Slightly lighter dark background */
+        color: #f1f1f1; /* Light text color */
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
 
-        .blog-item h3 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
+    .card-header {
+        padding: 10px;
+        background-color: #333; /* Slightly darker */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #444;
+    }
 
-        .blog-item p {
-            font-size: 0.9em;
-            color: #555;
-        }
+    .title {
+        margin: 0;
+        font-size: 1.1em;
+        color: #f1f1f1; /* Light text color */
+    }
 
-        .blog-item small {
-            display: block;
-            margin-top: 10px;
-            color: #999;
-        }
+    .timestamp {
+        font-size: 0.8em;
+        color: #999;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .card-content {
+        padding: 10px;
+        font-size: 0.9em;
+        color: #ddd; /* Light gray for content text */
+        height: auto;
+    }
+
+    .content-text {
+        display: inline;
+    }
+
+    .show-more {
+        color: #1e90ff;
+        cursor: pointer;
+    }
+
+    {% else %}
+    .blog-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        background-color: #fff;
+        max-width: {{ max_width }}px;
+        max-height: {{ max_height }}px;
+        overflow-y: auto; /* Enables vertical scrolling if content exceeds max-height */
+        margin: 0 auto;
+    }
+
+    .blog-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        background-color: #f7f7f7;
+        color: #333;
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
+
+    .card-header {
+        padding: 10px;
+        background-color: #eaeaea;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .title {
+        margin: 0;
+        font-size: 1.1em;
+        color: #333;
+    }
+
+    .timestamp {
+        font-size: 0.8em;
+        color: #999;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .card-content {
+        padding: 10px;
+        font-size: 0.9em;
+        color: #555;
+        height: auto;
+    }
+
+    .content-text {
+        display: inline;
+    }
+
+    .show-more {
+        color: #1e90ff;
+        cursor: pointer;
+    }
+    {% endif %}
     </style>
 </head>
 <body>
-    <div id="blog-container" class="blog-container"></div>
+    <div class="blog-container">
+        {% for blog in blogs %}
+        <div class="blog-card">
+            <div class="card-header">
+                <h2 class="title">{{ blog.title }}</h2>
+                <span class="timestamp">{{ blog.timestamp }}</span>
+            </div>
+            <img src="{{ blog.image }}" alt="Blog Image" class="card-image">
+            <div class="card-content">
+                <p class="content-text" id="content-{{ forloop.counter }}">{{ blog.content|truncatechars:100 }}</p>
+                {% if blog.content|length > 100 %}
+                <span class="show-more" onclick="showMore('content-{{ forloop.counter }}')">Show More</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
     <script>
-        // Function to create blog item elements
-        function createBlogItem(blog) {
-            let blogItem = document.createElement('div');
-            blogItem.className = 'blog-item';
-
-            let title = document.createElement('h3');
-            title.textContent = blog.title;
-
-            let image = document.createElement('img');
-            image.src = blog.image;
-            image.alt = blog.title;
-
-            let content = document.createElement('p');
-            content.textContent = blog.content;
-
-            let timestamp = document.createElement('small');
-            timestamp.textContent = `Posted on: ${blog.timestamp}`;
-
-            blogItem.appendChild(title);
-            blogItem.appendChild(image);
-            blogItem.appendChild(content);
-            blogItem.appendChild(timestamp);
-
-            blogItem.onclick = function () {
-                window.open(`myapp://blog/${blog.id}`, '_self');
-            };
-
-            return blogItem;
-        }
-
-        // Extract username from the URL
-        const url = new URL(window.location.href);
-        const pathname = url.pathname;
-        const segments = pathname.split('/');
-        const username = segments[segments.length - 2];
-
-        // Log the username to check if it's correctly extracted
-        console.log('Username:', username);
-
-        // Fetch the blog data from the API
-        fetch(`/api/get_top_3_blogs/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                let blogContainer = document.getElementById('blog-container');
-                data.forEach(blog => {
-                    let blogItem = createBlogItem(blog);
-                    blogContainer.appendChild(blogItem);
-                });
-            })
-            .catch(error => console.error('Error fetching blogs:', error));
+    function showMore(contentId) {
+        var contentElement = document.getElementById(contentId);
+        contentElement.innerHTML = contentElement.innerHTML.replace('Show More', '') + ' {{ blog.content|safe }}';
+    }
     </script>
 </body>
 </html>
