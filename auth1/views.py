@@ -1,3 +1,4 @@
+import string
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework import serializers
@@ -7,8 +8,13 @@ import pyrebase
 from pyrebase import pyrebase
 from dotenv import load_dotenv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pyrebase.pyrebase import storage
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+import random
+import smtplib
 
 load_dotenv()
 
@@ -126,15 +132,78 @@ def forgetpass(request):
             email_exists=db.child('users').get()
             for emails in email_exists.each():
                 if emails.val()['email'] == email:
+                    email=emails.val()['email']
                     email_exists=True
                     break
                 else:
                     email_exists=False
 
             if email_exists:
+                x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(32))
                 print(email_exists)
                 print(email)
                 print("email sent")
+
+                emaiid=os.getenv('email')
+                password=os.getenv('password')
+
+                print(email)
+
+                title="Password reset Request"
+
+                final_str_link=""
+
+                body=f"""
+                <h1>Password reset request</h1>
+                
+                div style="font-family: Arial, sans-serif; color: #333;">
+                <h1 style="text-align: center; color: #4CAF50;">Password Reset Request</h1>
+
+                <p>Dear User,</p>
+
+                <p>We understand that you are having trouble logging into your Bloggy account. To help you get back on track, we have received a request to reset your password.</p>
+
+                <p>If you initiated this request, you can reset your password by clicking the link below. For security reasons, this link will expire in 1 hour:</p>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <h2 style="display: inline-block; background: #f4f4f4; padding: 10px 20px; border: 1px solid #ddd; border-radius: 5px;">
+                <a href="{final_str_link}" style="text-decoration: none; color: #4CAF50;">Reset Password</a>
+                    </h2>
+                </div>
+
+                <p>If you did not request a password reset, please ignore this message. Your account will remain secure, and no changes will be made.</p>
+
+                <p>If you have any questions or need further assistance, please do not hesitate to contact our team.</p>
+
+                <p>Thank you for your understanding and cooperation.</p>
+
+                <p>Best regards,<br><strong>The Any Time Event Team</strong></p>
+                </div>
+            
+
+                """
+
+                msg=MIMEMultipart()
+                msg['From']=emaiid
+                msg['To']=email
+                msg['Subject']=title
+
+                msg.attach(MIMEText(body,'html'))
+
+                text=msg.as_string()
+
+                server=smtplib.SMTP('smtp.gmail.com',587)
+                server.starttls()
+                server.login(emaiid,password)
+                server.sendmail(emaiid,email,text)
+                server.quit()
+
+                expiry_duration = timedelta(hours=1)
+                expiry_time = datetime.now() + expiry_duration
+
+                
+
+                db.child('passwordreset').push({'email':email,'expiry':expiry_time.strftime('%Y-%m-%d %H:%M:%S')})
 
                 return JsonResponse({'message':'Mail sent'})
             
