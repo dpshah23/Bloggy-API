@@ -1,1 +1,1 @@
-# Bloggy : A interactive blog website
+# Bloggy : A interactive blog Application
