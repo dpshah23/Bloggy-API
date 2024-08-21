@@ -3,10 +3,7 @@
     "builds": [
       {
         "src": "manage.py",
-        "use": "@vercel/python",
-        "config": {
-          "zeroConfig": true
-        }
+        "use": "@vercel/python"
       }
     ],
     "routes": [
