@@ -5,3 +5,4 @@ django-cors-headers
 djangorestframework-jwt
 pyrebase4
 firebase-admin
+setuptools
