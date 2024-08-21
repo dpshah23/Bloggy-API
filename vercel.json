@@ -1,16 +1,15 @@
 {
-    "version": 2,
     "builds": [
-      {
-        "src": "manage.py",
-        "use": "@vercel/python"
-      }
+        {
+            "src": "bloggy_api/wsgi.py",
+            "use": "@vercel/python"
+        }
     ],
     "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/manage.py"
-      }
+        
+        {
+            "src": "/(.*)",
+            "dest": "bloggy_api/wsgi.py"
+        }
     ]
-  }
-  
+}
