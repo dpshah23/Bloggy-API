@@ -15,9 +15,35 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import random
 import smtplib
-from bloggy_api.settings import db, conn, bucket, auth
+
 # Create your views here.
 
+
+
+load_dotenv()
+
+
+config = {
+    "apiKey": os.getenv('apikey'),
+    "authDomain": os.getenv('authDomain'),
+    "projectId": os.getenv('projectId'),
+    "storageBucket": os.getenv('storageBucket'),
+    "messagingSenderId": os.getenv('messagingSenderId'),
+    "appId": os.getenv('appId'),
+    "measurementId": os.getenv('measurementId'),
+    "databaseURL": os.getenv('databaseURL')
+}
+
+
+print(config)
+
+firebase = pyrebase.initialize_app(config)
+conn = firebase.auth()
+
+bucket=firebase.storage()
+db=firebase.database()
+print(conn)
+print(db)
 
 @csrf_exempt
 @api_view(['POST'])

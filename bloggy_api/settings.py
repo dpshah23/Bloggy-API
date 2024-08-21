@@ -17,25 +17,7 @@ import pyrebase
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
-config = {
-    "apiKey": os.getenv('apikey'),
-    "authDomain": os.getenv('authDomain'),
-    "projectId": os.getenv('projectId'),
-    "storageBucket": os.getenv('storageBucket'),
-    "messagingSenderId": os.getenv('messagingSenderId'),
-    "appId": os.getenv('appId'),
-    "measurementId": os.getenv('measurementId'),
-    "databaseURL": os.getenv('databaseURL')
-}
-
-
-
-firebase=pyrebase.initialize_app(config)
-conn=firebase.auth()
-bucket=firebase.storage()
-db=firebase.database()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

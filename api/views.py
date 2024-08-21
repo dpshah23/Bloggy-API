@@ -23,7 +23,39 @@ from firebase_admin import credentials, storage, db
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from bloggy_api.settings import db,bucket,auth,ref
+
+
+load_dotenv()
+
+
+config = {
+    "apiKey": os.getenv('apikey'),
+    "authDomain": os.getenv('authDomain'),
+    "projectId": os.getenv('projectId'),
+    "storageBucket": os.getenv('storageBucket'),
+    "messagingSenderId": os.getenv('messagingSenderId'),
+    "appId": os.getenv('appId'),
+    "measurementId": os.getenv('measurementId'),
+    "databaseURL": os.getenv('databaseURL')
+}
+cred=credentials.Certificate("serviceAccountKey.json")
+
+firebase_admin.initialize_app(cred, {
+    'storageBucket': config['storageBucket'],
+    'databaseURL': config['databaseURL']
+})
+
+ref=db.reference()
+
+print(config)
+
+firebase = pyrebase.initialize_app(config)
+conn = firebase.auth()
+
+bucket=firebase.storage()
+db=firebase.database()
+print(conn)
+print(db)
 
 # Create your views here.
 
