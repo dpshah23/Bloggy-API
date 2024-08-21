@@ -1,18 +1,19 @@
 {
+    "version": 2,
     "builds": [
-        {
-            "src": "github_visitor_info_admin/wsgi.py",
-            "use": "@vercel/python"
+      {
+        "src": "manage.py",
+        "use": "@vercel/python",
+        "config": {
+          "zeroConfig": true
         }
+      }
     ],
     "routes": [
-        {
-            "src": "/static/(.*)",
-            "dest": "/static/$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "github_visitor_info_admin/wsgi.py"
-        }
+      {
+        "src": "/(.*)",
+        "dest": "/manage.py"
+      }
     ]
-}
+  }
+  
