@@ -15,6 +15,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import random
 import smtplib
+from PIL import Image, ImageDraw, ImageFont
+import io
+
 
 # Create your views here.
 
@@ -94,10 +97,17 @@ def signup(request):
         if user.val() is not None:
             return JsonResponse({'message': 'username_exists'})
 
+        avatar_image = avatar(email)
+        avatar_name = f"{username}.png"
+
+        imagepush=bucket.child("avatars").child(avatar_name).put(avatar_image)
+
+        avatar_url = bucket.child("avatars").child(avatar_name).get_url(None)
         
+
         islogin = conn.create_user_with_email_and_password(email, password)
 
-        paylaod = {'name': name, 'email': email, 'username': username, 'phone':phone}
+        paylaod = {'name': name, 'email': email, 'username': username, 'phone':phone , 'avatar': avatar_url}
 
         data = {'name': name, 'email': email, 'username': username}
         db.child('users').child(username).set(paylaod)
@@ -220,3 +230,30 @@ def forgetpass(request):
     except Exception as e:
         print(e)
         return JsonResponse({'message':'Password reset failed'})
+    
+
+def avatar(email,size=128):
+    image = Image.new('RGB', (size, size), color='white')
+    draw = ImageDraw.Draw(image)
+
+    circle_color = tuple(random.randint(0, 255) for _ in range(3))
+    draw.ellipse([(0, 0), (size, size)], fill=circle_color, outline=None)
+
+    text = email[0].upper()
+    font_size = size // 2
+    try:
+        font = ImageFont.truetype("arial.ttf", font_size)
+    except IOError:
+        font = ImageFont.load_default()
+
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    text_x = (size - text_width) / 2
+    text_y = (size - text_height) / 2
+    draw.text((text_x, text_y), text, font=font, fill='white')
+
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+
+    return buffer.getvalue()

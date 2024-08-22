@@ -160,13 +160,15 @@ def profile(request,username):
         
 
         if data is not None:
-           
+            
+            data['message']="success"
+            
             return JsonResponse(data)
         else:
             return JsonResponse({'message':'User not found'},status=404)
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'Failed to fetch user data'})
+        return JsonResponse({'message':'Failed'})
     
 
 @csrf_exempt
