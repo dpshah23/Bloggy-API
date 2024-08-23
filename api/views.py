@@ -156,7 +156,7 @@ def getblogs(request):
 @api_view(['POST'])
 def profile(request,username):
     try:
-        data=db.child('users').child(username).get()
+        data=db.child('users').child(username).get().val()
         
 
         if data is not None:
