@@ -85,7 +85,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bloggy_api.wsgi.application'
+WSGI_APPLICATION = 'bloggy_api.wsgi.app'
 
 
 # Database
