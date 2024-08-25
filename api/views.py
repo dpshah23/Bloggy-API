@@ -163,6 +163,7 @@ def profile(request,username):
             
             data['message']="success"
             
+            print(data)
             return JsonResponse(data)
         else:
             return JsonResponse({'message':'User not found'},status=404)
