@@ -176,19 +176,21 @@ def profile(request,username):
 @api_view(['POST'])
 def getblog(request,id):
     try:
-        data=db.child('blogs').child(id).get()
+        print("Blog id :",id)
+        data=db.child('blogs').child(id).get().val()
         
+        print(data)
 
         if data is not None:
            
-            return JsonResponse(data)
+            return JsonResponse(data,safe=False)
         else:
-            return JsonResponse({'message':'Blog not found'},status=404)
+            return JsonResponse({'message':'Blog not found'},status=404,safe=False)
         
     except Exception as e:
 
         print(e)
-        return JsonResponse({'message':'Failed to fetch blog data'})
+        return JsonResponse({'message':'Failed to fetch blog data'},safe=False)
     
 @csrf_exempt
 @api_view(['POST'])
