@@ -123,34 +123,40 @@ def createblog(request):
 @api_view(['GET'])
 def getblogs(request):
     try:
-        data=ref.child("blogs").get()
+        data = ref.child("blogs").get()
         print(data)
 
         if data is not None:
-            blog_list=list(data.values())
-        
+            blog_list = list(data.values())
         else:
-            blog_list=[]
+            blog_list = []
 
-        page_number=request.GET.get('page',1)
+       
+        page_number = request.GET.get('page', 1)
+        print("page number ", page_number)
 
-        paginator=Paginator(blog_list,10)
+        paginator = Paginator(blog_list, 10)
 
-        page_obj=paginator.get_page(page_number)
+        try:
+          
+            page_obj = paginator.page(page_number)
+        except EmptyPage:
+            
+            page_obj = []
 
-        blogs_json=json.loads(json.dumps(page_obj.object_list))
+       
+        blogs_json = json.loads(json.dumps(page_obj.object_list))
 
-        response_data={
-            "data":blogs_json,
-            "page_number":page_obj.number,
-            "total_pages":paginator.num_pages
+        response_data = {
+            "data": blogs_json,
+            "page_number": page_obj.number if blogs_json else page_number,
+            "total_pages": paginator.num_pages
         }
 
         return JsonResponse(response_data)
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'Failed to fetch blogs'})
-
+        return JsonResponse({'message': 'Failed to fetch blogs'}, status=500)
 
 @csrf_exempt
 @api_view(['POST'])
