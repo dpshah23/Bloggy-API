@@ -214,13 +214,46 @@ def getblog(request,id):
 @api_view(['POST'])
 def getuserblogs(request,username):
     try:
-        data=db.child('blogs').get()
-
-        blog_list=list(data.values())
+        data=ref.child('blogs').get()
         
-        user_blogs=[blog for blog in blog_list if blog['username']==username]
+        data=list(data.values())
 
-        return JsonResponse(user_blogs,safe=False)
+        user_blogs=[blog for blog in data if blog['username']==username]
+
+        print(user_blogs.count)
+        if user_blogs.count==0:
+            return JsonResponse({'message':'User has no blogs'},status=404)
+
+        if data is not None:
+            print("none")
+            user_blogs=list(user_blogs)
+
+            print("User blogs ",user_blogs)
+            print("Total Blogs : ",len(user_blogs))
+            
+            blog_list=user_blogs[::-1]
+        
+        else:
+            blog_list=[]
+
+        page_number=request.GET.get('page',1)
+
+        print("current page number ",page_number)
+
+
+        paginator=Paginator(blog_list,10)
+
+        page_obj=paginator.get_page(page_number)
+
+        blogs_json=json.loads(json.dumps(page_obj.object_list))
+
+        response_data={
+            "data":blogs_json,
+            "page_number":page_obj.number,
+            "total_pages":paginator.num_pages
+        }
+
+        return JsonResponse(response_data,safe=False)
     
     except Exception as e:
     
