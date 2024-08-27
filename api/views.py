@@ -199,11 +199,12 @@ def getblog(request,id):
 
         if data is not None:
             data=data.val()
+            data['message']="success"
             data['views']=db.child('views').child(id).get().val()
 
             return JsonResponse(data)
         else:
-            return JsonResponse({'message':'Blog not found'},status=404)
+            return JsonResponse({'message':'Failed'},status=404)
         
     except Exception as e:
 
