@@ -124,15 +124,22 @@ def createblog(request):
 def getblogs(request):
     try:
         data=ref.child("blogs").get()
-        print(data)
+        # print(data)
 
         if data is not None:
             blog_list=list(data.values())
+
+            print("Total Blogs : ",len(blog_list))
+            
+            blog_list=blog_list[::-1]
         
         else:
             blog_list=[]
 
         page_number=request.GET.get('page',1)
+
+        print("current page number ",page_number)
+
 
         paginator=Paginator(blog_list,10)
 
