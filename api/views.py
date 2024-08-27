@@ -211,7 +211,7 @@ def getblog(request,id):
         return JsonResponse({'message':'Failed to fetch blog data'})
     
 @csrf_exempt
-@api_view(['POST'])
+@api_view(['GET'])
 def getuserblogs(request,username):
     try:
         data=ref.child('blogs').get()
