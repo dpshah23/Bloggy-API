@@ -183,11 +183,24 @@ def profile(request,username):
 @api_view(['POST'])
 def getblog(request,id):
     try:
+
+        try:
+
+            data_views=db.child('views').child(id).get().val()
+            views=data_views+1
+            db.child('views').child(id).set(views)
+
+        except Exception as e:
+            print(e)
+
+            db.child('views').child(id).set(1)
         data=db.child('blogs').child(id).get()
         
 
         if data is not None:
-           
+            data=data.val()
+            data['views']=db.child('views').child(id).get().val()
+
             return JsonResponse(data)
         else:
             return JsonResponse({'message':'Blog not found'},status=404)
