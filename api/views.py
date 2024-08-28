@@ -267,37 +267,65 @@ def getuserblogs(request,username):
 
 @csrf_exempt    
 @api_view(['POST'])
-def followuser(request):
+def followuser(request, username):
     try:
-        data=json.loads(request.body.decode('utf-8'))
-        username=request.data['username']
-        follower=request.data['follower']
-        
-        db.child(username).child('followers').push(follower)
+        data = json.loads(request.body.decode('utf-8'))
+        follower = data['follower']
 
-        db.child(follower).child('following').push(username)
-       
-        return JsonResponse({'message':'Followed'})
+        followers_ref = db.child("users").child(username).child('followers')
+        followers_data = followers_ref.get().val() or {}
+        
+        if username in followers_data:
+            return JsonResponse({'message': 'Cannot follow yourself'})
+        
+        if follower in followers_data.values():
+            return JsonResponse({'message': 'Already following'})
+
+        db.child("users").child(username).child('followers').push(follower)
+        db.child("users").child(follower).child('following').push(username)
+
+        return JsonResponse({'message': 'Followed successfully'})
+
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'Failed'})
+        return JsonResponse({'message': 'Failed to follow'}, status=500)
+
+
     
 @csrf_exempt
 @api_view(['POST'])
-def unfollowuser(request):
+def unfollowuser(request, username):
     try:
-        data=json.loads(request.body.decode('utf-8'))
-        username=request.data['username']
-        follower=request.data['follower']
-        
-        db.child(username).child('followers').child(follower).remove()
+        data = json.loads(request.body.decode('utf-8'))
+        follower = data['follower']
 
-        db.child(follower).child('following').child(username).remove()
-       
-        return JsonResponse({'message':'Unfollowed'})
+        follows_ref=db.child("users").child(username).child('followers').get().val()
+
+        if follows_ref is None:
+            return JsonResponse({'message': 'User not found'}, status=404)
+        
+        for key, value in follows_ref.items():
+            if value == follower:
+                db.child("users").child(username).child('followers').child(key).remove()
+                break
+        
+        following_ref=db.child("users").child(follower).child('following').get().val()
+
+        if following_ref is None:
+            return JsonResponse({'message': 'User not found'}, status=404)
+        
+        for key, value in following_ref.items():
+            if value == username:
+                db.child("users").child(follower).child('following').child(key).remove()
+                break
+            
+
+        return JsonResponse({'message': 'Unfollowed successfully'})
+
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'Failed'})
+        return JsonResponse({'message': 'Failed to unfollow'}, status=500)
+
     
 @csrf_exempt
 @api_view(['POST'])
@@ -312,8 +340,8 @@ def getuserprofiledata(request,username):
         if data is not None:
             data['message']="success"
             try:
-                data['followers']=db.child(username).child('followers').get().val()
-                data['following']=db.child(username).child('following').get().val()
+                data['followers']=db.child("users").child(username).child('followers').get().val()
+                data['following']=db.child("users").child(username).child('following').get().val()
                 data['total']=len(list(data['followers']))
                 data['following_total']=len(list(data['following']))
             except Exception as e:

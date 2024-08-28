@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import createblog,getblogs,profile,getblog,getuserblogs,getuserprofiledata
+from .views import createblog,getblogs,profile,getblog,getuserblogs,getuserprofiledata,unfollowuser,followuser
 
 
 urlpatterns = [
@@ -9,5 +9,7 @@ urlpatterns = [
     path('getblog/<str:id>/', getblog,name="getblog"),
     path('getuserblog/<str:username>/', getuserblogs,name="getuserblog"),
     path('getuserprofile/<str:username>/', getuserprofiledata,name="getuserprofile"),
+    path('unfollowuser/<str:username>/', unfollowuser,name="unfollowuser"),
+    path('followuser/<str:username>/', followuser,name="followuser"),
 
 ]
