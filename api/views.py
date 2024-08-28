@@ -23,6 +23,8 @@ from firebase_admin import credentials, storage, db
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from operator import itemgetter
+
 
 
 load_dotenv()
@@ -127,8 +129,7 @@ def getblogs(request):
         # print(data)
 
         if data is not None:
-            blog_list=list(data.values())
-
+            blog_list=sorted(list(data.values()),key=itemgetter('timestamp'),reverse=False)
             print("Total Blogs : ",len(blog_list))
             
             blog_list=blog_list[::-1]
@@ -217,7 +218,7 @@ def getuserblogs(request,username):
     try:
         data=ref.child('blogs').get()
         
-        data=list(data.values())
+        data=blog_list=sorted(list(data.values()),key=itemgetter('timestamp'),reverse=False)
 
         user_blogs=[blog for blog in data if blog['username']==username]
 
