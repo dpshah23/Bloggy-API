@@ -329,39 +329,44 @@ def unfollowuser(request, username):
     
 @csrf_exempt
 @api_view(['POST'])
-def getuserprofiledata(request,username):
+def getuserprofiledata(request, username):
     try:
+        data = json.loads(request.body.decode('utf-8'))
+        username_following = data.get('username_following', '')
+        
+        user_data = db.child('users').child(username).get().val()
 
-        data=json.loads(request.body.decode('utf-8'))
-
-        username_following=data['username_following']
-        data=db.child('users').child(username).get().val()
-
-        if data is not None:
-            data['message']="success"
+        if user_data is not None:
+            user_data['message'] = "success"
             try:
-                data['followers']=db.child("users").child(username).child('followers').get().val()
-                data['following']=db.child("users").child(username).child('following').get().val()
-                data['total']=len(list(data['followers']))
-                data['following_total']=len(list(data['following']))
+                # Fetch followers and following
+                followers = db.child("users").child(username).child('followers').get().val() or {}
+                following = db.child("users").child(username).child('following').get().val() or {}
+
+                user_data['followers'] = followers
+                user_data['following'] = following
+
+                # Safely count followers and following
+                user_data['total'] = len(followers)
+                user_data['following_total'] = len(following)
+
             except Exception as e:
-                
-                data['followers']=[]
-                data['following']=[]
-                data['total']=0
-                data['following_total']=0
+                print(e)
+                user_data['followers'] = {}
+                user_data['following'] = {}
+                user_data['total'] = 0
+                user_data['following_total'] = 0
 
-            if username_following in data['followers']:
-                data['is_following'] = True
-            else:
-                data['is_following'] = False
+            # Check if the current user is following the profile user
+            user_data['is_following'] = username_following in followers.values()
 
-    
-            return JsonResponse(data)
-        
+            print(user_data)
+
+            return JsonResponse(user_data)
+
         else:
-            return JsonResponse({'message':'User not found'},status=404)
-        
+            return JsonResponse({'message': 'User not found'}, status=404)
+
     except Exception as e:
         print(e)
-        return JsonResponse({'message':'Failed'})
+        return JsonResponse({'message': 'Failed'}, status=500)
