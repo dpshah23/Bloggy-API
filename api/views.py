@@ -173,7 +173,16 @@ def profile(request,username):
         if data is not None:
             
             data['message']="success"
-            
+            followers = db.child("users").child(username).child('followers').get().val() or {}
+            following = db.child("users").child(username).child('following').get().val() or {}
+
+            data['followers'] = followers
+            data['following'] = following
+
+                # Safely count followers and following
+            data['total'] = len(followers)
+            data['following_total'] = len(following)
+
             print(data)
             return JsonResponse(data)
         else:
