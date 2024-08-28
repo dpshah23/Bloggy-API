@@ -113,7 +113,10 @@ def createblog(request):
             "id": id1
         }
         path =id1
-        db.child("blogs").child(path).set(data)
+        data12=ref.child("blogs").child(path).set(data)
+
+        print(data12)   
+        print("Blog created successfully")
         return JsonResponse({'message':'Blog created successfully'})
     
     except Exception as e:
