@@ -264,4 +264,76 @@ def getuserblogs(request,username):
     
         print(e)
         return JsonResponse({'message':'Failed to fetch user blogs'})
+
+@csrf_exempt    
+@api_view(['POST'])
+def followuser(request):
+    try:
+        data=json.loads(request.body.decode('utf-8'))
+        username=request.data['username']
+        follower=request.data['follower']
+        
+        db.child(username).child('followers').push(follower)
+
+        db.child(follower).child('following').push(username)
+       
+        return JsonResponse({'message':'Followed'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Failed'})
     
+@csrf_exempt
+@api_view(['POST'])
+def unfollowuser(request):
+    try:
+        data=json.loads(request.body.decode('utf-8'))
+        username=request.data['username']
+        follower=request.data['follower']
+        
+        db.child(username).child('followers').child(follower).remove()
+
+        db.child(follower).child('following').child(username).remove()
+       
+        return JsonResponse({'message':'Unfollowed'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Failed'})
+    
+@csrf_exempt
+@api_view(['POST'])
+def getuserprofiledata(request,username):
+    try:
+
+        data=json.loads(request.body.decode('utf-8'))
+
+        username_following=data['username_following']
+        data=db.child('users').child(username).get().val()
+
+        if data is not None:
+            data['message']="success"
+            try:
+                data['followers']=db.child(username).child('followers').get().val()
+                data['following']=db.child(username).child('following').get().val()
+                data['total']=len(list(data['followers']))
+                data['following_total']=len(list(data['following']))
+            except Exception as e:
+                
+                data['followers']=[]
+                data['following']=[]
+                data['total']=0
+                data['following_total']=0
+
+            if username_following in data['followers']:
+                data['is_following'] = True
+            else:
+                data['is_following'] = False
+
+    
+            return JsonResponse(data)
+        
+        else:
+            return JsonResponse({'message':'User not found'},status=404)
+        
+    except Exception as e:
+        print(e)
+        return JsonResponse({'message':'Failed'})
