@@ -280,6 +280,12 @@ def followuser(request, username):
     try:
         data = json.loads(request.body.decode('utf-8'))
         follower = data['follower']
+        usernamedata=data['username']
+
+        print(follower,usernamedata)
+
+        if usernamedata==follower:
+            return JsonResponse({'message': 'Cannot follow yourself'})
 
         followers_ref = db.child("users").child(username).child('followers')
         followers_data = followers_ref.get().val() or {}
