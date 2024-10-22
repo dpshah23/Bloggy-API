@@ -22,4 +22,5 @@ urlpatterns = [
     path('api-auth/', include('auth1.urls')),
     path('api/', include('api.urls')),
     path('', include('home.urls')),
+    path('adminpanel/', include('adminpanel.urls')),
 ]
