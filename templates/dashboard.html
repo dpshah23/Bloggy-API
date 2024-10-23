@@ -1,7 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock title %}
 {% block body %}
+<h1 class="mt-5">Welcome to the dashboard</h1>
+<h2 class="mt-5">Total users: {{total_users}}</h2>
 
-{# Add your code here #}
+<h2 class="mt-5">Total blogs: {{total_blogs}}</h2>
+
+<h1 class="mt-5">Recent blogs</h1>
+
+{% for i in blog_list %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px" width="50px">
+                    <h5 class="card-title">{{i.title}}</h5>
+                    <p class="card-text">{{i.content}}</p>
+                    <a href="/blog/{{i.id}}" class="btn btn-primary">Read more</a>
+                    <p class="card-text">Views: {{i.views}}</p>
+                    <p class="card-text">Author: {{i.username}}</p>
+                    <p class="card-text">Created at: {{i.timestamp}}</p>
+</div>
+{% endfor %}
+
+<h1 class="mt-5">Max viewed blogs</h1>
+{% for i in blog_list %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px" width="50px">
+                    <h5 class="card-title">{{i.title}}</h5>
+                    <p class="card-text">{{i.content}}</p>
+                    <a href="/blog/{{i.id}}" class="btn btn-primary">Read more</a>
+                    <p class="card-text">Views: {{i.views}}</p>
+                    <p class="card-text">Author: {{i.username}}</p>
+                    <p class="card-text">Created at: {{i.timestamp}}</p>
+</div>
+{% endfor %}
+
 
 {% endblock body %}

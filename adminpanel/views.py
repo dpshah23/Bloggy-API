@@ -37,41 +37,42 @@ def index(request):
         return render(request, 'dashboard.html')
 
 def dashboard(request):
-    
-    if 'email'not in request.session:
-            return redirect('/adminpanel/login/')
-    
-    total_users = db.child('users').shallow().get().val()
-    total_users = len(total_users) if total_users else 0
+    if 'email' not in request.session:
+        return redirect('/adminpanel/login/')
 
-    total_blogs= db.child('blogs').shallow().get().val()
-    total_blogs = len(total_blogs) if total_blogs else 0
+    total_users = db.child('users').shallow().get().val()
+    total_users_len = len(total_users) if total_users else 0
+
+    total_blogs = db.child('blogs').shallow().get().val()
+    total_blogs_len = len(total_blogs) if total_blogs else 0
     
-    data=db.child('blogs').get().val()
+    data = db.child('blogs').get().val()
 
     if data is not None:
-            blog_list=sorted(list(data.values()),key=itemgetter('timestamp'),reverse=False)
-            print("Total Blogs : ",len(blog_list))
-            
-            blog_list=blog_list[::-1]
-            print(blog_list)
-
-            for blog in blog_list:
-                 blog['views']=db.child('views').child(blog['id']).shallow().get().val()
-                 blog['views']=len(blog['views']) if blog['views'] else 0
-            max_viewed_blogs = sorted(blog_list, key=itemgetter('views'), reverse=True)[:5]
-            
-            context = {
-                'total_users': total_users,
-                'total_blogs': total_blogs,
-                'blog_list': blog_list,
-                'max_viewed_blogs': max_viewed_blogs
-            }
-    else:
-            blog_list=[]
-    return render(request, 'dashboard.html', context)
+        blog_list = sorted(list(data.values()), key=itemgetter('timestamp'), reverse=False)
+        print("Total Blogs: ", len(blog_list))
         
-  
+        blog_list = blog_list[::-1]
+        print(blog_list)
+
+        for blog in blog_list:
+            views = db.child('views').child(blog['id']).shallow().get().val()
+            blog['views'] = views if views is not None else 0  # Set default to 0
+
+        max_viewed_blogs = sorted(blog_list, key=itemgetter('views'), reverse=True)[:5]
+
+        context = {
+            'total_users': total_users_len,
+            'total_blogs': total_blogs_len,
+            'blog_list': blog_list,
+            'max_viewed_blogs': max_viewed_blogs
+        }
+        print(context)
+    else:
+        blog_list = []
+
+    return render(request, 'dashboard.html', context)
+
 
         
 def login(request):
