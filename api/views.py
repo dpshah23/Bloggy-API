@@ -136,7 +136,7 @@ def getblogs(request):
             print("Total Blogs : ",len(blog_list))
             
             blog_list=blog_list[::-1]
-        
+            
         else:
             blog_list=[]
 
