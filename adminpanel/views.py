@@ -57,7 +57,9 @@ def dashboard(request):
 
         for blog in blog_list:
             views = db.child('views').child(blog['id']).shallow().get().val()
-            blog['views'] = views if views is not None else 0  # Set default to 0
+            blog['decoded_content'] = decodebase64(blog['content'])  # Decode content
+            blog['views'] = views if views is not None else 0  # Default to 0 if no views
+
 
         max_viewed_blogs = sorted(blog_list, key=itemgetter('views'), reverse=True)[:5]
 
@@ -95,3 +97,6 @@ def login(request):
 def logout(request):
     request.session.flush()
     return redirect('/adminpanel/login/')
+
+def decodebase64(data):
+    return data.encode('ascii')

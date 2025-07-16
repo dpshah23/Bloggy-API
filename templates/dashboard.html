@@ -1,45 +1,195 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock title %}
 {% block body %}
-<h1 class="mt-5">Welcome to the dashboard</h1>
-<h2 class="mt-5">Total users: {{total_users}}</h2>
+<style>
+    /* dashboard.css */
 
-<h2 class="mt-5">Total blogs: {{total_blogs}}</h2>
+    /* General Styles */
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Arial', sans-serif;
+        color: #333;
+    }
 
-<h1 class="mt-5">Recent blogs</h1>
+    .welcome-title {
+        color: black;
+        font-size: 4rem; /* Adjust font size as needed */
+        font-weight: bold;
+        
+        margin-left: 125px; /* Add margin for spacing */
+    }   
+    .header-container {
+        display: flex;
+        align-items: center; /* Center vertically */
+        justify-content: space-between; /* Space between elements */
+        margin-bottom: 30px; /* Space below the header */
+    }
 
-{% for i in blog_list %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
+    h1, h2 {
+        color: #007bff;
+        text-align: center;
+    }
+
+    /* Card Styles */
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        margin: 20px 0;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-body {
+        padding: 20px;
+        text-align: center; /* Center text in the card body */
+    }
+
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .card-text {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .card-img-top {
+        border-radius: 10px;
+        max-height: 350px;
+        object-fit: cover;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    /* Container Styles */
+    .container {
+        margin-bottom: 30px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+    }
+    
+     /* Layout Adjustments */
+     .welcome-section {
+        text-align: center;
+        margin: 40px 0;
+    }
+
+    .stats-row {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 40px;
+    }
+    .blogs-card{
+        margin-left: 26px
+    }
+    .blogs-titles{
+        font-size: 3rem;
+    color: black;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 125px;
+    }
+    /* Responsive Design */
+     /* Responsive Design */
+    @media (max-width: 768px) {
+        .card {
+            margin-bottom: 20px;
+            flex: 1 1 100%;
+        }
+        
+        .stats-row {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+
+<div class="header-container">
+    <h1 class="welcome-title">Welcome to the Dashboard</h1>
+    <div class="stats-row">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px" width="50px">
+                    <h5 class="card-title">Total Users</h5>
+                    <p class="card-text">{{ total_users }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="blogs-card col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Blogs</h5>
+                    <p class="card-text">{{ total_blogs }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1 class="blogs-titles mt-5">Recent blogs</h1>
+<div class="container">
+    <div class="row">
+        {% for i in blog_list %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px">
                     <h5 class="card-title">{{i.title}}</h5>
-                    <p class="card-text">{{i.content}}</p>
-                    <a href="/blog/{{i.id}}" class="btn btn-primary">Read more</a>
+                    <p class="card-text">{{i.decoded_content}}</p>
+                    
                     <p class="card-text">Views: {{i.views}}</p>
                     <p class="card-text">Author: {{i.username}}</p>
                     <p class="card-text">Created at: {{i.timestamp}}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
-{% endfor %}
 
-<h1 class="mt-5">Max viewed blogs</h1>
-{% for i in blog_list %}
+<h1 class="blogs-titles mt-5">Max viewed blogs</h1>
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
+        {% for i in blog_list %}
+        <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px" width="50px">
+                    <img src="{{i.image}}" class="card-img-top" alt="..." height="350px">
                     <h5 class="card-title">{{i.title}}</h5>
-                    <p class="card-text">{{i.content}}</p>
-                    <a href="/blog/{{i.id}}" class="btn btn-primary">Read more</a>
+                    <p class="card-text">{{i.decoded_content}}</p>
+                    
                     <p class="card-text">Views: {{i.views}}</p>
                     <p class="card-text">Author: {{i.username}}</p>
                     <p class="card-text">Created at: {{i.timestamp}}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
-{% endfor %}
-
 
 {% endblock body %}
